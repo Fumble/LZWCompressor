@@ -54,10 +54,12 @@ public class Dictionary {
 		Set<Entry<Integer, String>> entryset = dico.entrySet();
 		Iterator<Entry<Integer, String>> it = entryset.iterator();
 		int res = -1;
-		while (it.hasNext()) {
+		boolean found = false;
+		while (it.hasNext() && !found) {
 			Entry<Integer, String> elem = it.next();
 			if (elem.getValue().equals(value)) {
 				res = elem.getKey();
+				found = true;
 			}
 		}
 		return res;
@@ -65,6 +67,7 @@ public class Dictionary {
 
 	public void put(int key, String value) {
 		dico.put(key, value);
+		setIndex(key+1);
 	}
 
 	public int getIndex() {
