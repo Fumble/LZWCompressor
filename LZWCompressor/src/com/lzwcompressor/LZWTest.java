@@ -2,12 +2,19 @@ package com.lzwcompressor;
 
 public class LZWTest {
 
-	/**
-	 * @param args
-	 */
+//	   w = Nul;
+//	   tant que (lecture d'un caractère c) faire
+//	       si (wc existe dans le dictionnaire) alors
+//	           w = wc;
+//	       sinon
+//	           ajouter wc au dictionnaire;
+//	           écrire le code de w;
+//	           w = c;
+//	       fin si
+//	   fin tant que
+//	   écrire le code de w;
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
+		Dictionary dico = new Dictionary();
 	}
 
 }
