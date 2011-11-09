@@ -61,5 +61,4 @@ public class LZWTest {
 			c = chaine.get(i);
 		} 
 	}
-
 }
