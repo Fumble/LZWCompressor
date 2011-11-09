@@ -8,9 +8,11 @@ import java.util.TreeMap;
 
 public class Dictionary {
 	private TreeMap<Integer, String> dico;
+	private int index;
 	
 	public Dictionary(){
 		dico = new TreeMap<Integer, String>();
+		setIndex(0);
 	}
 	
 	public static String readFileAsString(String filePath)
@@ -37,5 +39,37 @@ public class Dictionary {
 			System.out.println(nomCurr+" ==> "+dico.get(nomCurr));
 		}
 	}
+	
+	public void init(){
+		for(char i = 0; i<256; i++){
+			dico.put((int)i, String.valueOf(i));
+		}
+		setIndex(256);
+	}
+	
+	public String getValue(int key){
+		return dico.get(key);
+	}
+	
+	public void put(int key, String value){
+		dico.put(key, value);
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public void setIndex(int index) {
+		this.index = index;
+	}
+	
+	public boolean containsValue(String value){
+		return dico.containsValue(value);
+	}
+	
+	public boolean containsKey(int key){
+		return dico.containsKey(key);
+	}
+
 
 }
