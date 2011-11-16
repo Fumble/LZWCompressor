@@ -1,6 +1,10 @@
 package com.lzwcompressor;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -16,7 +20,10 @@ public class LZWTest {
 	public LZWTest(int numBits){
 		this.numBits = numBits;
 	}
-
+	
+    private File file ;
+    private FileInputStream file_input;
+    private DataInputStream data_input ;
 	/**
 	 * @param args
 	 * @throws IOException
@@ -48,6 +55,7 @@ public class LZWTest {
 					os.writeByte(w.charAt(0));
 				} else {
 					System.out.println(dicoCompression.getKey(w));
+					// System.out.println(w);
 					writeCode(os, dicoCompression.getKey(w));
 				}
 				w = String.valueOf(c);
@@ -55,10 +63,53 @@ public class LZWTest {
 			i++;
 		}
 		System.out.println(dicoCompression.getKey(w));
+		// System.out.println(w);
 		writeCode(os, dicoCompression.getKey(w));
 		os.flush();
 		os.close();
 	}
+
+	public void decompression(String filename) {
+        Short code = null;
+        String c = null,w = null, entree = null;
+        
+        
+        file=new File(filename);
+        try {
+			file_input = new FileInputStream(file);
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
+        data_input    = new DataInputStream(file_input);
+        
+        try {
+			code = data_input.readShort();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+        c= dicoCompression.getValue(code);
+        
+		int i = 1;
+		w = c;
+		dicoDecompression = new Dictionary();
+		while (code != -1) {
+			if (code > 255 && dicoDecompression.containsKey(code)) {
+				entree = w;
+			} else if (code > 255
+					&& !dicoDecompression.containsKey(code)) {
+				entree = w + w.charAt(0);
+			} else {
+				entree = c;
+			}
+			System.out.println(entree);
+			dicoDecompression.put(255 + i, w + entree.charAt(0));
+			w = entree;
+			i++;
+			c= dicoCompression.getValue(code);
+		}
+	}
+
 
 	void writeCode(DataOutputStream os, int code) throws IOException {
 //		System.out.println("BIT TO WRITE "
@@ -68,28 +119,4 @@ public class LZWTest {
 			code /= 2;
 		}
 	}
-
-	// public void decompression(ArrayList<String> chaine){
-	// String c = chaine.get(0);
-	// int i=1;
-	// String w = c;
-	// String entree;
-	// dicoDecompression = new Dictionary();
-	// while(i < chaine.size()){
-	// if(c>255 && dicoDecompression.containsValue(String.valueOf(c))){
-	// entree = w;
-	// }
-	// else if(c > 255 && !dicoDecompression.containsValue(String.valueOf(c))){
-	// entree = w + w.charAt(0);
-	// }
-	// else{
-	// entree = String.valueOf(c);
-	// }
-	// System.out.println(entree);
-	// dicoDecompression.put(255+i,w + entree.charAt(0));
-	// w = entree;
-	// i++;
-	// c = chaine.get(i);
-	// }
-	// }
 }
