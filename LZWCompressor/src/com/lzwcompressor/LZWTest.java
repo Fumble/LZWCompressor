@@ -1,27 +1,35 @@
 package com.lzwcompressor;
 
 import java.io.DataOutputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 public class LZWTest {
 	private Dictionary dicoCompression;
 	private Dictionary dicoDecompression;
+	private int numBits;
+	
+	public LZWTest(){
+		numBits = 12;
+	}
+	
+	public LZWTest(int numBits){
+		this.numBits = numBits;
+	}
 
 	/**
 	 * @param args
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		String s = "tobeornottobeortobeornot";
+		//String s = "tobeornottobeortobeornot";
+		String s ="Loremipsumdolorsitamet,consecteturadipiscingelit.Fuscenecturpisquisnequepulvinarporttitoracatodio.";
 		LZWTest lzw = new LZWTest();
 		lzw.compression(s);
 	}
 
 	public void compression(String s) throws IOException {
-		dicoCompression = new Dictionary();
+		dicoCompression = new Dictionary(1<<numBits);
 		dicoCompression.init();
 		String w = "";
 		char c;

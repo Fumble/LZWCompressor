@@ -10,10 +10,18 @@ import java.util.TreeMap;
 public class Dictionary {
 	private TreeMap<Integer, String> dico;
 	private int index;
+	private final int maxSize;
 
 	public Dictionary() {
 		dico = new TreeMap<Integer, String>();
 		setIndex(0);
+		maxSize = (1<<12);
+	}
+
+	public Dictionary(int maxSize) {
+		dico = new TreeMap<Integer, String>();
+		setIndex(0);
+		this.maxSize = maxSize;
 	}
 
 	public static String readFileAsString(String filePath)
@@ -66,8 +74,10 @@ public class Dictionary {
 	}
 
 	public void put(int key, String value) {
-		dico.put(key, value);
-		setIndex(key+1);
+		if (getSize() < maxSize) {
+			dico.put(key, value);
+			setIndex(key + 1);
+		}
 	}
 
 	public int getIndex() {
@@ -84,6 +94,10 @@ public class Dictionary {
 
 	public boolean containsKey(int key) {
 		return dico.containsKey(key);
+	}
+
+	private int getSize() {
+		return dico.size();
 	}
 
 }
