@@ -1,11 +1,14 @@
 package com.lzwcompressor;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 
 public class LZWTest {
 	private Dictionary dicoCompression;
@@ -17,19 +20,23 @@ public class LZWTest {
 
 	/**
 	 * @param args
+	 * @throws IOException
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		String s = "tobeornottobeortobeornot";
 		LZWTest lzw = new LZWTest();
 		lzw.compression(s);
 	}
 
-	public void compression(String s) {
+	public void compression(String s) throws IOException {
 		dicoCompression = new Dictionary();
 		dicoCompression.init();
 		String w = "";
 		char c;
 		int i = 0;
+		String filename = "test.txt";
+		DataOutputStream os = new DataOutputStream(new FileOutputStream(
+				filename));
 		while (i < s.length()) {
 			c = s.charAt(i);
 			if (dicoCompression.containsValue(w + c)) {
@@ -38,9 +45,11 @@ public class LZWTest {
 				dicoCompression.put(255 + (i - ((w + c).length() - 2)), w + c);
 				if (dicoCompression.getKey(w) <= 255) {
 					System.out.println(w);
+					os.writeByte(w.charAt(0));
 				} else {
 					System.out.println(dicoCompression.getKey(w));
 					// System.out.println(w);
+					writeCode(os, dicoCompression.getKey(w));
 				}
 				w = String.valueOf(c);
 			}
@@ -48,6 +57,9 @@ public class LZWTest {
 		}
 		System.out.println(dicoCompression.getKey(w));
 		// System.out.println(w);
+		writeCode(os, dicoCompression.getKey(w));
+		os.flush();
+		os.close();
 	}
 
 	public void decompression(String filename) {
@@ -88,6 +100,16 @@ public class LZWTest {
 			w = entree;
 			i++;
 			c= dicoCompression.getValue(code);
+		}
+	}
+
+
+	void writeCode(DataOutputStream os, int code) throws IOException {
+//		System.out.println("BIT TO WRITE "
+//				+ (32 - Integer.numberOfLeadingZeros(code)));
+		for (int i = 0; i < (32 - Integer.numberOfLeadingZeros(code)); ++i) {
+			os.write(code & 1);
+			code /= 2;
 		}
 	}
 }
