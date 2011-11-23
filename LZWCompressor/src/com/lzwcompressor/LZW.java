@@ -4,9 +4,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class LZW {
 	private File file;
@@ -60,21 +60,23 @@ public class LZW {
 		os.close();
 	}
 
-	
 	public void decompression(String filename) throws IOException {
 		int code;
 		String c = null, w = null, entree = null;
-		
+		ArrayList<Integer> compressed = new ArrayList<Integer>();
+
 		dicoDecompression = new Dictionary();
 		dicoDecompression.init();
 
 		file = new File(filename);
-		
+
 		file_input = new FileInputStream(file);
+		compressed = readCompressedFile(file_input);
+		code = compressed.get(0);
 
-		//data_input = new DataInputStream(file_input);
+		// data_input = new DataInputStream(file_input);
 
-		code = read_char(file_input);
+		//code = read_char(file_input);
 
 		c = dicoDecompression.getValue(code);
 
@@ -82,7 +84,7 @@ public class LZW {
 		w = c;
 
 		while (code != -1) {
-		
+
 			if (code > 255 && dicoDecompression.containsKey(code)) {
 				entree = w;
 			} else if (code > 255 && !dicoDecompression.containsKey(code)) {
@@ -94,31 +96,38 @@ public class LZW {
 			dicoDecompression.put(255 + i, w + entree.charAt(0));
 			w = entree;
 			i++;
-			
+
 			c = dicoCompression.getValue(code);
-			
-			code = read_char(file_input);
+
+			//code = read_char(file_input);
 			System.out.println(code);
 		}
 	}
-	
-	
-	
-	private int read_char(FileInputStream file) throws IOException{
+
+	private int read_char(FileInputStream file) throws IOException {
 		int return_value;
-		int input_bit_count=0;
-		long input_bit_buffer=0;
-		
-		
-		while (input_bit_count <= 24)
-		{
-		  input_bit_buffer |= (long) file_input.read() << (24-input_bit_count);
-		  input_bit_count += 8;
+		int input_bit_count = 0;
+		long input_bit_buffer = 0;
+
+		while (input_bit_count <= 24) {
+			input_bit_buffer |= (long) file_input.read() << (24 - input_bit_count);
+			input_bit_count += 8;
 		}
-		return_value=(int) (input_bit_buffer >> (32-numBits));
+		return_value = (int) (input_bit_buffer >> (32 - numBits));
 		input_bit_buffer <<= numBits;
 		input_bit_count -= numBits;
-		return(return_value);
+		return (return_value);
+	}
+
+	private ArrayList<Integer> readCompressedFile(FileInputStream file)
+			throws IOException {
+		ArrayList<Integer> result = new ArrayList<Integer>();
+		int code = 0;
+		while (code != -1) {
+			code = read_char(file);
+			result.add(code);
+		}
+		return result;
 	}
 
 	private void writeCode(DataOutputStream os, int code) {
