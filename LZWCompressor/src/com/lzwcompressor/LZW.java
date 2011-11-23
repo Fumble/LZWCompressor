@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class LZW {
 	private File file;
@@ -65,6 +66,8 @@ public class LZW {
 		int code;
 		String c = null, w = null, entree = null;
 		
+		ArrayList<Integer> code_fichier = new ArrayList<Integer>();
+		
 		dicoDecompression = new Dictionary();
 		dicoDecompression.init();
 
@@ -74,8 +77,9 @@ public class LZW {
 
 		//data_input = new DataInputStream(file_input);
 
-		code = read_char(file_input);
-
+		code_fichier = read_char(file_input);
+		code = code_fichier.get(0);
+		
 		c = dicoDecompression.getValue(code);
 
 		int i = 1;
@@ -104,7 +108,8 @@ public class LZW {
 	
 	
 	
-	private int read_char(FileInputStream file) throws IOException{
+	private ArrayList<Integer> read_char(FileInputStream file) throws IOException{
+		/*
 		int return_value;
 		int input_bit_count=0;
 		long input_bit_buffer=0;
@@ -119,6 +124,8 @@ public class LZW {
 		input_bit_buffer <<= numBits;
 		input_bit_count -= numBits;
 		return(return_value);
+		*/
+		return new ArrayList<Integer>();
 	}
 
 	private void writeCode(DataOutputStream os, int code) {
