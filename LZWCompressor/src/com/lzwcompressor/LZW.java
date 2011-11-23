@@ -15,6 +15,8 @@ public class LZW {
 	private Dictionary dicoCompression;
 	private Dictionary dicoDecompression;
 	private int numBits;
+	private int output_bit_buffer = 0;
+	private int output_bit_count = 0;
 
 	public LZW() {
 		numBits = 12;
@@ -38,7 +40,7 @@ public class LZW {
 			if (dicoCompression.containsValue(w + c)) {
 				w = w + c;
 			} else {
-				dicoCompression.put(255 + (i - ((w + c).length() - 2)), w + c);
+				dicoCompression.put(dicoCompression.getIndex(), w + c);
 				if (dicoCompression.getKey(w) <= 255) {
 					System.out.println(w);
 					os.write(w.charAt(0));
@@ -93,12 +95,20 @@ public class LZW {
 		}
 	}
 
-	void writeCode(DataOutputStream os, int code) throws IOException {
-		// System.out.println("BIT TO WRITE "
-		// + (32 - Integer.numberOfLeadingZeros(code)));
-		for (int i = 0; i < (32 - Integer.numberOfLeadingZeros(code)); i++) {
-			os.write(code & 1);
-			code /= 2;
+	private void writeCode(DataOutputStream os, int code) {
+		output_bit_buffer |= code << (32 - numBits - output_bit_count);
+		output_bit_count += numBits;
+
+		while (output_bit_count >= 8) {
+			try {
+				os.write(output_bit_buffer >> 24);
+			} catch (IOException e) {
+				System.out
+						.println("IOException while writing the output file !");
+				System.exit(1);
+			}
+			output_bit_buffer <<= 8;
+			output_bit_count -= 8;
 		}
 	}
 

@@ -15,7 +15,7 @@ public class Dictionary {
 	public Dictionary() {
 		dico = new TreeMap<Integer, String>();
 		setIndex(0);
-		maxSize = (1<<12);
+		maxSize = (1 << 12);
 	}
 
 	public Dictionary(int maxSize) {
