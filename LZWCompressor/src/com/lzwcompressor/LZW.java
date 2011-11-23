@@ -58,23 +58,17 @@ public class LZW {
 		os.close();
 	}
 
-	public void decompression(String filename) {
+	public void decompression(String filename) throws IOException {
 		Short code = null;
 		String c = null, w = null, entree = null;
 
 		file = new File(filename);
-		try {
-			file_input = new FileInputStream(file);
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
-		}
+		
+		file_input = new FileInputStream(file);
+
 		data_input = new DataInputStream(file_input);
 
-		try {
-			code = data_input.readShort();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		code = data_input.readShort();
 
 		c = dicoCompression.getValue(code);
 
@@ -94,6 +88,8 @@ public class LZW {
 			w = entree;
 			i++;
 			c = dicoCompression.getValue(code);
+			
+			code = data_input.readShort();
 		}
 	}
 
