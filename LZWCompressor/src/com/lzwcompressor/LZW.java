@@ -63,6 +63,11 @@ public class LZW {
 	public void decompression(String filename) throws IOException {
 		int code;
 		String c = null, w = null, entree = null;
+		int index =0;
+		int offset = 0;
+		int limit = 255;
+		int currentByte = 1;
+		int startBit = 0;
 
 		ArrayList<Integer> compressed = new ArrayList<Integer>();
 
@@ -72,36 +77,50 @@ public class LZW {
 		file = new File(filename);
 
 		file_input = new FileInputStream(file);
-		compressed = readCompressedFile(file_input);
-		code = compressed.get(0);
-
-		// data_input = new DataInputStream(file_input);
 
 		compressed = readCompressedFile(file_input);
-		code = compressed.get(0);
-		
+		code = compressed.get(index) >>> (32 - ((8+offset) * currentByte + startBit));
 		c = dicoDecompression.getValue(code);
-
-		int i = 1;
+		
 		w = c;
 
 		while (code != -1) {
-
+			
+			if((32-((8+offset)* currentByte + startBit)) >= 0){
+				code = compressed.get(index) >>> (32 - ((8+offset) * currentByte + startBit));
+				c = dicoDecompression.getValue(code);
+				
+				if(32-((8+offset)* currentByte + startBit) == 0){
+					index++;
+				}
+			}
+			else{
+				startBit = Math.abs(32 - (8+offset) * currentByte);
+				code = compressed.get(index) >>> (32 - ((8+offset) * currentByte + 2*startBit));
+				index++;
+				code |= compressed.get(index) >>> (32 - ((8+offset) * currentByte+startBit));
+				
+				c = dicoDecompression.getValue(code);
+			}
+			
+			
+			if(code == 0x0){
+				offset += 1;
+			}
+			
 			if (code > 255 && dicoDecompression.containsKey(code)) {
-				entree = w;
+				entree = dicoDecompression.getValue(code);
 			} else if (code > 255 && !dicoDecompression.containsKey(code)) {
-				entree = w + w.charAt(0);
+				entree += w;
 			} else {
 				entree = c;
 			}
 			System.out.println(entree);
-			dicoDecompression.put(255 + i, w + entree.charAt(0));
+			
+			dicoDecompression.put(dicoDecompression.getIndex(), w + entree);
+			
 			w = entree;
-			i++;
-
-			c = dicoCompression.getValue(code);
-
-			//code = read_char(file_input);
+			
 			System.out.println(code);
 		}
 	}
