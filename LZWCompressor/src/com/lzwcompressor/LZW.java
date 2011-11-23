@@ -127,6 +127,9 @@ public class LZW {
 			code = read_char(file);
 			result.add(code);
 		}
+		for(int i=0; i<result.size(); i++){
+			System.out.println(result.get(i));
+		}
 		return result;
 	}
 
