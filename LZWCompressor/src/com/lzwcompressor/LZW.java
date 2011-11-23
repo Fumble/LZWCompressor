@@ -60,24 +60,29 @@ public class LZW {
 		os.close();
 	}
 
+	
 	public void decompression(String filename) throws IOException {
-		Short code = null;
+		int code;
 		String c = null, w = null, entree = null;
+		
+		dicoDecompression = new Dictionary();
+		dicoDecompression.init();
 
 		file = new File(filename);
 		
 		file_input = new FileInputStream(file);
 
-		data_input = new DataInputStream(file_input);
+		//data_input = new DataInputStream(file_input);
 
-		code = data_input.readShort();
+		code = read_char(file_input);
 
-		c = dicoCompression.getValue(code);
+		c = dicoDecompression.getValue(code);
 
 		int i = 1;
 		w = c;
-		dicoDecompression = new Dictionary();
+
 		while (code != -1) {
+		
 			if (code > 255 && dicoDecompression.containsKey(code)) {
 				entree = w;
 			} else if (code > 255 && !dicoDecompression.containsKey(code)) {
@@ -89,10 +94,31 @@ public class LZW {
 			dicoDecompression.put(255 + i, w + entree.charAt(0));
 			w = entree;
 			i++;
+			
 			c = dicoCompression.getValue(code);
 			
-			code = data_input.readShort();
+			code = read_char(file_input);
+			System.out.println(code);
 		}
+	}
+	
+	
+	
+	private int read_char(FileInputStream file) throws IOException{
+		int return_value;
+		int input_bit_count=0;
+		long input_bit_buffer=0;
+		
+		
+		while (input_bit_count <= 24)
+		{
+		  input_bit_buffer |= (long) file_input.read() << (24-input_bit_count);
+		  input_bit_count += 8;
+		}
+		return_value=(int) (input_bit_buffer >> (32-numBits));
+		input_bit_buffer <<= numBits;
+		input_bit_count -= numBits;
+		return(return_value);
 	}
 
 	private void writeCode(DataOutputStream os, int code) {
