@@ -96,7 +96,7 @@ public class LZW {
 			}
 			else{
 				startBit = Math.abs(32 - (8+offset) * currentByte);
-				code = compressed.get(index) >>> (32 - ((8+offset) * currentByte + 2*startBit));
+				code = compressed.get(index) >>> (32 - ((8+offset) * currentByte - 2 * startBit));
 				index++;
 				code |= compressed.get(index) >>> (32 - ((8+offset) * currentByte+startBit));
 				
