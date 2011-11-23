@@ -63,6 +63,7 @@ public class LZW {
 	public void decompression(String filename) throws IOException {
 		int code;
 		String c = null, w = null, entree = null;
+
 		ArrayList<Integer> compressed = new ArrayList<Integer>();
 
 		dicoDecompression = new Dictionary();
@@ -76,7 +77,8 @@ public class LZW {
 
 		// data_input = new DataInputStream(file_input);
 
-		//code = read_char(file_input);
+		compressed = readCompressedFile(file_input);
+		code = compressed.get(0);
 
 		c = dicoDecompression.getValue(code);
 
@@ -99,7 +101,7 @@ public class LZW {
 
 			c = dicoCompression.getValue(code);
 
-			//code = read_char(file_input);
+			// code = read_char(file_input);
 			System.out.println(code);
 		}
 	}
@@ -116,6 +118,7 @@ public class LZW {
 		return_value = (int) (input_bit_buffer >> (32 - numBits));
 		input_bit_buffer <<= numBits;
 		input_bit_count -= numBits;
+
 		return (return_value);
 	}
 
@@ -126,9 +129,6 @@ public class LZW {
 		while (code != -1) {
 			code = read_char(file);
 			result.add(code);
-		}
-		for(int i=0; i<result.size(); i++){
-			System.out.println(result.get(i));
 		}
 		return result;
 	}
