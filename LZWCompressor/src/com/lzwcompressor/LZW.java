@@ -79,26 +79,35 @@ public class LZW {
 		file_input = new FileInputStream(file);
 
 		compressed = readCompressedFile(file_input);
-		code = compressed.get(index) >>> (32 - ((8+offset) * currentByte + startBit));
+		code = compressed.get(index) >> (32 - ((8+offset) * currentByte + startBit));
 		c = dicoDecompression.getValue(code);
 		
 		w = c;
+		
+		int mask = 0x000f;
 
 		while (code != -1) {
 			
 			if((32-((8+offset)* currentByte + startBit)) >= 0){
-				code = compressed.get(index) >>> (32 - ((8+offset) * currentByte + startBit));
+				code = compressed.get(index) >> (32 - ((8+offset) * currentByte + startBit));
+				code = code & mask;
+				
 				c = dicoDecompression.getValue(code);
+				
+				currentByte++;
 				
 				if(32-((8+offset)* currentByte + startBit) == 0){
 					index++;
+					currentByte=1;
 				}
 			}
 			else{
 				startBit = Math.abs(32 - (8+offset) * currentByte);
-				code = compressed.get(index) >>> (32 - ((8+offset) * currentByte - 2 * startBit));
+				code = compressed.get(index) >> (32 - ((8+offset) * currentByte - 2 * startBit));
+				code = code & startBit;
+				currentByte=1;
 				index++;
-				code |= compressed.get(index) >>> (32 - ((8+offset) * currentByte+startBit));
+				code |= compressed.get(index) >> (32 - ((8+offset) * currentByte+startBit));
 				
 				c = dicoDecompression.getValue(code);
 			}
