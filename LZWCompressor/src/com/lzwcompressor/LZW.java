@@ -84,6 +84,7 @@ public class LZW {
 		int offset = 0;
 		int currentByte = 1;
 		int startBit = 0;
+		int limit = 255;
 
 		ArrayList<Integer> compressed = new ArrayList<Integer>();
 
@@ -131,6 +132,9 @@ public class LZW {
 			}
 
 			if (code == 0x0) {
+				offset += 1;
+			}
+			else if(code==(limit*(1+offset)+1)){
 				offset += 1;
 			}
 
