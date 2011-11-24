@@ -87,7 +87,7 @@ public class LZW {
 		int currentByte = 1;
 		int startBit = 0;
 		int limit = 255;
-		int mask = 0x000f;
+		int mask = 0x00FF;
 
 		ArrayList<Integer> compressed = new ArrayList<Integer>();
 
@@ -99,11 +99,19 @@ public class LZW {
 		file_input = new FileInputStream(file);
 
 		compressed = readCompressedFile(file_input);
-		code = compressed.get(index) >> 24;
+		int toto = compressed.get(index);
+		code = /*compressed.get(index)*/ (toto >> 24) ;
+		System.out.println(code);
+		code &= mask;
 		
 		c = dicoDecompression.getValue(code);
 		w = c;
 
+//		toto = compressed.get(index);
+//		code = compressed.get(index) >> (32 - ((8 + offset)
+//				* currentByte + startBit));
+//		code = code & mask;
+		System.out.println("Code: "+ code);
 
 		while (code != -1) {
 
