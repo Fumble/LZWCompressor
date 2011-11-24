@@ -56,7 +56,8 @@ public class LZW {
 				} else if(((dicoCompression.getIndex() - 1) > limit)){
 					writeCode(os, symbol & offset);
 					symbol = 0xFFFF;
-					limit *= 2;	
+					limit = limit * 2 + 1;	
+					offset++;
 				}
 				if (dicoCompression.getKey(w) <= 255) {
 					System.out.println(w);
