@@ -17,13 +17,18 @@ public class LZW {
 	private int numBits;
 	private int output_bit_buffer = 0;
 	private int output_bit_count = 0;
-
+	private int separator = 0xFFFF;
+	private char separator8 = 0x0000;
+	private int curr;
+	
 	public LZW() {
-		numBits = 12;
+		this.numBits = 12;
+		this.curr = 8;
 	}
 
 	public LZW(int numBits) {
 		this.numBits = numBits;
+		this.curr = 8;
 	}
 
 	public void compression(String s) throws IOException {
@@ -54,6 +59,7 @@ public class LZW {
 			i++;
 		}
 		System.out.println(dicoCompression.getKey(w));
+		dicoCompression.getKey(w);
 		// System.out.println(w);
 		writeCode(os, dicoCompression.getKey(w));
 		os.flush();
