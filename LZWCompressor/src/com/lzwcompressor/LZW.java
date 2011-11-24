@@ -25,7 +25,6 @@ public class LZW {
 	public LZW(int numBits) {
 		this.numBits = numBits;
 	}
-	
 
 	public void compression(String s) throws IOException {
 		dicoCompression = new Dictionary(1 << numBits);
@@ -37,35 +36,37 @@ public class LZW {
 		String filename = "test.txt";
 		DataOutputStream os = new DataOutputStream(new FileOutputStream(
 				filename));
-		
+
 		int symbol8 = 0x0;
 		int symbol = 0xFFFF;
 		int offset = 8;
-		
+
 		while (i < s.length()) {
 			c = s.charAt(i);
 			if (dicoCompression.containsValue(w + c)) {
 				w = w + c;
 			} else {
 				dicoCompression.put(dicoCompression.getIndex(), w + c);
-				if(((dicoCompression.getIndex() - 1) > limit) && (symbol8 == 0x0)){
-					writeCode(os, symbol8);
-					symbol8 = 0x0001;
-					offset = 9;
-					limit = 511;
-				} else if(((dicoCompression.getIndex() - 1) > limit)){
-					writeCode(os, symbol & offset);
-					symbol = 0xFFFF;
-					limit = limit * 2 + 1;	
-					offset++;
-				}
 				if (dicoCompression.getKey(w) <= 255) {
 					System.out.println(w);
 					os.write(w.charAt(0));
 				} else {
+					if (((dicoCompression.getIndex() - 1) > limit)
+							&& (symbol8 == 0x0)) {
+						writeCode(os, symbol8);
+						symbol8 = 0x0001;
+						offset = 9;
+						limit = 511;
+					} else if (((dicoCompression.getIndex() - 1) > limit)) {
+						writeCode(os, symbol & offset);
+						symbol = 0xFFFF;
+						limit = limit * 2 + 1;
+						offset++;
+					}
 					System.out.println(dicoCompression.getKey(w));
 					// System.out.println(w);
 					writeCode(os, dicoCompression.getKey(w));
+
 				}
 				w = String.valueOf(c);
 			}
@@ -134,8 +135,7 @@ public class LZW {
 
 			if (code == 0x0) {
 				offset += 1;
-			}
-			else if(code==(limit*(1+offset)+1)){
+			} else if (code == (limit * (1 + offset) + 1)) {
 				offset += 1;
 			}
 
@@ -146,10 +146,18 @@ public class LZW {
 			} else {
 				entree = c;
 			}
-			//System.out.println(entree);
 			
 			dicoDecompression.put(dicoDecompression.getIndex(), w+entree.charAt(0));
 			
+			System.out.println(entree);
+
+			dicoDecompression.put(dicoDecompression.getIndex(),
+					w + entree.charAt(0));
+			System.out.println(" code =============== " + code);
+			System.out.println("dico " + dicoDecompression);
+			System.out.println("w '" + w + "'");
+			System.out.println("entree " + entree.charAt(0));
+
 			w = entree;
 
 			//System.out.println(c);
@@ -166,7 +174,7 @@ public class LZW {
 			input_bit_count += 8;
 		}
 		return_value = (int) (input_bit_buffer >> (32 - numBits));
-		input_bit_buffer <<= numBits;
+		// input_bit_buffer <<= numBits;
 		input_bit_count -= numBits;
 
 		return (return_value);
