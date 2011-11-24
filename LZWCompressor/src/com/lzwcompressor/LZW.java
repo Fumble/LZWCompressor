@@ -25,6 +25,7 @@ public class LZW {
 	public LZW(int numBits) {
 		this.numBits = numBits;
 	}
+	
 
 	public void compression(String s) throws IOException {
 		dicoCompression = new Dictionary(1 << numBits);
@@ -32,15 +33,31 @@ public class LZW {
 		String w = "";
 		char c;
 		int i = 0;
+		int limit = 255;
 		String filename = "test.txt";
 		DataOutputStream os = new DataOutputStream(new FileOutputStream(
 				filename));
+		
+		int symbol8 = 0x0;
+		int symbol = 0xFFFF;
+		int offset = 8;
+		
 		while (i < s.length()) {
 			c = s.charAt(i);
 			if (dicoCompression.containsValue(w + c)) {
 				w = w + c;
 			} else {
 				dicoCompression.put(dicoCompression.getIndex(), w + c);
+				if(((dicoCompression.getIndex() - 1) > limit) && (symbol8 == 0x0)){
+					writeCode(os, symbol8);
+					symbol8 = 0x0001;
+					offset = 9;
+					limit = 511;
+				} else if(((dicoCompression.getIndex() - 1) > limit)){
+					writeCode(os, symbol & offset);
+					symbol = 0xFFFF;
+					limit *= 2;	
+				}
 				if (dicoCompression.getKey(w) <= 255) {
 					System.out.println(w);
 					os.write(w.charAt(0));
@@ -63,9 +80,8 @@ public class LZW {
 	public void decompression(String filename) throws IOException {
 		int code;
 		String c = null, w = null, entree = null;
-		int index =0;
+		int index = 0;
 		int offset = 0;
-		int limit = 255;
 		int currentByte = 1;
 		int startBit = 0;
 
@@ -79,46 +95,45 @@ public class LZW {
 		file_input = new FileInputStream(file);
 
 		compressed = readCompressedFile(file_input);
-		code = compressed.get(index) >> (32 - ((8+offset) * currentByte + startBit));
+		code = compressed.get(index) >> (32 - ((8 + offset) * currentByte + startBit));
 		c = dicoDecompression.getValue(code);
-		
+
 		w = c;
-		
+
 		int mask = 0x000f;
 
 		while (code != -1) {
-			
-			if((32-((8+offset)* currentByte + startBit)) >= 0){
-				code = compressed.get(index) >> (32 - ((8+offset) * currentByte + startBit));
+
+			if ((32 - ((8 + offset) * currentByte + startBit)) >= 0) {
+				code = compressed.get(index) >> (32 - ((8 + offset)
+						* currentByte + startBit));
 				code = code & mask;
-				
+
 				c = dicoDecompression.getValue(code);
-				
-				
-				
-				if(32-((8+offset)* currentByte + startBit) == 0){
+
+				if (32 - ((8 + offset) * currentByte + startBit) == 0) {
 					index++;
-					currentByte=1;
-				}else{
+					currentByte = 1;
+				} else {
 					currentByte++;
 				}
-			}
-			else{
-				startBit = Math.abs(32 - (8+offset) * currentByte);
-				code = compressed.get(index) >> (32 - ((8+offset) * currentByte - 2 * startBit));
+			} else {
+				startBit = Math.abs(32 - (8 + offset) * currentByte);
+				code = compressed.get(index) >> (32 - ((8 + offset)
+						* currentByte - 2 * startBit));
 				code = code & startBit;
-				currentByte=1;
+				currentByte = 1;
 				index++;
-				code |= compressed.get(index) >> (32 - ((8+offset) * currentByte+startBit));
-				
+				code |= compressed.get(index) >> (32 - ((8 + offset)
+						* currentByte + startBit));
+
 				c = dicoDecompression.getValue(code);
 			}
-			
-			
-			if(code == 0x0){
+
+			if (code == 0x0) {
 				offset += 1;
 			}
-			
+
 			if (code > 255 && dicoDecompression.containsKey(code)) {
 				entree = dicoDecompression.getValue(code);
 			} else if (code > 255 && !dicoDecompression.containsKey(code)) {
@@ -127,18 +142,16 @@ public class LZW {
 				entree = c;
 			}
 			System.out.println(entree);
-			
+
 			dicoDecompression.put(dicoDecompression.getIndex(), w + entree);
-			
+
 			w = entree;
-			
+
 			System.out.println(code);
 		}
 	}
-	
-	
-	
-	private int read_char(FileInputStream file) throws IOException{
+
+	private int read_char(FileInputStream file) throws IOException {
 		int return_value;
 		int input_bit_count = 0;
 		long input_bit_buffer = 0;
@@ -151,7 +164,7 @@ public class LZW {
 		input_bit_buffer <<= numBits;
 		input_bit_count -= numBits;
 
-		return(return_value);
+		return (return_value);
 	}
 
 	private ArrayList<Integer> readCompressedFile(FileInputStream file)
