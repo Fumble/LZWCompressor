@@ -99,7 +99,7 @@ public class LZW {
 		compressed = readCompressedFile(file_input);
 		code = compressed.get(index) >> (32 - ((8 + offset) * currentByte + startBit));
 		c = dicoDecompression.getValue(code);
-
+		System.out.println(compressed.get(0));
 		w = c;
 
 		int mask = 0x000f;
@@ -146,13 +146,13 @@ public class LZW {
 			} else {
 				entree = c;
 			}
-			System.out.println(entree);
+			//System.out.println(entree);
 			
 			dicoDecompression.put(dicoDecompression.getIndex(), w+entree.charAt(0));
 			
 			w = entree;
 
-			System.out.println(code);
+			//System.out.println(c);
 		}
 	}
 
