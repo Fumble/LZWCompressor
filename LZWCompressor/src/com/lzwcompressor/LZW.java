@@ -122,13 +122,13 @@ public class LZW {
 			if (code > 255 && dicoDecompression.containsKey(code)) {
 				entree = dicoDecompression.getValue(code);
 			} else if (code > 255 && !dicoDecompression.containsKey(code)) {
-				entree += w;
+				entree = w + w.charAt(0);
 			} else {
 				entree = c;
 			}
 			System.out.println(entree);
 			
-			dicoDecompression.put(dicoDecompression.getIndex(), w + entree);
+			dicoDecompression.put(dicoDecompression.getIndex(), w+entree.charAt(0));
 			
 			w = entree;
 			
