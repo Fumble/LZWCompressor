@@ -37,7 +37,7 @@ public class LZW {
 		DataOutputStream os = new DataOutputStream(new FileOutputStream(
 				filename));
 
-		int symbol8 = 0x0;
+		char symbol8 = 0x0;
 		int symbol = 0xFFFF;
 		int offset = 8;
 
@@ -54,7 +54,7 @@ public class LZW {
 					if (((dicoCompression.getIndex() - 1) > limit)
 							&& (symbol8 == 0x0)) {
 						writeCode(os, symbol8);
-						symbol8 = 0x0001;
+						symbol8 = 0x01;
 						offset = 9;
 						limit = 511;
 					} else if (((dicoCompression.getIndex() - 1) > limit)) {
@@ -103,7 +103,7 @@ public class LZW {
 		code &= mask;
 		c = dicoDecompression.getValue(code);
 		System.out.println(c);
-		
+
 		w = c;
 
 		currentByte++;
@@ -116,7 +116,6 @@ public class LZW {
 				code = code & mask;
 
 				c = dicoDecompression.getValue(code);
-
 
 				if (32 - ((8 + offset) * currentByte + startBit) == 0) {
 					index++;
@@ -139,9 +138,15 @@ public class LZW {
 
 			if (code == 0x0) {
 				offset += 1;
-				mask += 0x0001;
-			} else if (code == (limit * (1 + offset) + 1)) {
+				mask += 1;
+				limit = limit * 2 + 1;
+				System.out.println("MARK");
+				continue;
+			} else if (code == limit) {
 				offset += 1;
+				mask += 1;
+				limit = limit * 2 + 1;
+				continue;
 			}
 
 			if (code > 255 && dicoDecompression.containsKey(code)) {
@@ -151,16 +156,17 @@ public class LZW {
 			} else {
 				entree = c;
 			}
-			
+
 			System.out.println(entree);
-			
-			dicoDecompression.put(dicoDecompression.getIndex(), w+entree.charAt(0));
-			
-			//System.out.println(code);
-			
+
+			dicoDecompression.put(dicoDecompression.getIndex(),
+					w + entree.charAt(0));
+
+			// System.out.println(code);
+
 			w = entree;
 
-			//System.out.println(c);
+			// System.out.println(c);
 		}
 	}
 
@@ -173,7 +179,7 @@ public class LZW {
 			input_bit_buffer |= (int) file_input.read() << (24 - input_bit_count);
 			input_bit_count += 8;
 		}
-		//return_value = (int) (input_bit_buffer >> (32 - numBits));
+		// return_value = (int) (input_bit_buffer >> (32 - numBits));
 		return_value = input_bit_buffer;
 		// input_bit_buffer <<= numBits;
 		input_bit_count -= numBits;
@@ -186,15 +192,14 @@ public class LZW {
 		DataInputStream dsi = new DataInputStream(file);
 		ArrayList<Integer> result = new ArrayList<Integer>();
 		int code = 0;
-		try{
+		try {
 			while (true) {
 				code = dsi.readInt();
 				result.add(code);
 			}
-		}catch(EOFException e) {
-	        System.out.println(
-	          "End of stream encountered");
-	    }
+		} catch (EOFException e) {
+			System.out.println("End of stream encountered");
+		}
 		return result;
 	}
 
