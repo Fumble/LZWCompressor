@@ -111,40 +111,37 @@ public class LZW {
 
 		while (code != -1) {
 
-			if ((32 - ((8 + offset) * currentByte + startBit)) >= 0) {
-				code = compressed.get(index) >> (32 - ((8 + offset)
-						* currentByte + startBit));
+			if ((32 - ((8 + offset) + startBit)) >= 0) {
+				code = compressed.get(index) >> (32 - ((8 + offset) + startBit));
 				code = code & mask;
-
+				
 				c = dicoDecompression.getValue(code);
-
-				System.out.println("offset " + offset + " index " + index
-						+ " byte " + currentByte + " code " + code + " char "
-						+ c);
-
-				if (32 - ((8 + offset) * currentByte + startBit) == 0) {
+				
+				System.out.println("offset "+offset+" index "+index+" byte "+" code "+code+" char "+c);	
+				
+				if (32 - ((8 + offset) + startBit) == 0) {
 					index++;
-					currentByte = 1;
+					startBit += 8 + offset;
+					startBit %= 32;
 				} else {
-					currentByte++;
+					startBit += 8 + offset;
+					startBit %= 32;
 				}
 			} else {
-				startBit = Math.abs(32 - (8 + offset) * currentByte);
-
-				System.out.println("offset " + offset + " index " + index
-						+ " byte " + currentByte + " code " + code + " char "
-						+ c);
-				System.out.println("startBit " + startBit);
-
-				code = compressed.get(index) >> (32 - ((8 + offset)
-						* currentByte - 2 * startBit));
+				startBit = Math.abs(32 - (8 + offset) + startBit);
+				
+				System.out.println("offset "+offset+" index "+index+" code "+code+" char "+c);	
+				System.out.println("startBit "+startBit);
+				
+				code = compressed.get(index) >> (32 - ((32 - 8 + offset - startBit)));
 				code = code & startBit;
-				currentByte = 1;
 				index++;
-				code |= compressed.get(index) >> (32 - ((8 + offset)
-						* currentByte + startBit));
+				code |= compressed.get(index) >> (32 - startBit);
 
 				c = dicoDecompression.getValue(code);
+				
+				startBit += 8 + offset;
+				startBit %= 32;
 			}
 
 			if (code == 0x0 && !test) {
