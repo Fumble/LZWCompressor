@@ -1,6 +1,8 @@
 package com.lzwcompressor;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -85,6 +87,7 @@ public class LZW {
 		int currentByte = 1;
 		int startBit = 0;
 		int limit = 255;
+		int mask = 0x000f;
 
 		ArrayList<Integer> compressed = new ArrayList<Integer>();
 
@@ -95,12 +98,12 @@ public class LZW {
 
 		file_input = new FileInputStream(file);
 
-		code = compressed.get(index) >> (32 - ((8 + offset) * currentByte + startBit));
+		compressed = readCompressedFile(file_input);
+		code = compressed.get(index) >> 24;
+		
 		c = dicoDecompression.getValue(code);
-
 		w = c;
 
-		int mask = 0x000f;
 
 		while (code != -1) {
 
@@ -143,18 +146,14 @@ public class LZW {
 			} else {
 				entree = c;
 			}
-			System.out.println(entree);
-
-			dicoDecompression.put(dicoDecompression.getIndex(),
-					w + entree.charAt(0));
-			//System.out.println(" code =============== " + code);
-			//System.out.println("dico " + dicoDecompression);
-			//System.out.println("w '" + w + "'");
-			//System.out.println("entree " + entree.charAt(0));
-
+			
+			dicoDecompression.put(dicoDecompression.getIndex(), w+entree.charAt(0));
+			
+			//System.out.println(code);
+			
 			w = entree;
 
-			System.out.println(code);
+			//System.out.println(c);
 		}
 	}
 
@@ -177,11 +176,18 @@ public class LZW {
 
 	private ArrayList<Integer> readCompressedFile(FileInputStream file)
 			throws IOException {
+		DataInputStream dsi = new DataInputStream(file);
 		ArrayList<Integer> result = new ArrayList<Integer>();
 		int code = 0;
-		while (code != -1) {
-			code = read_char(file);
-		}
+		try{
+			while (true) {
+				code = dsi.readInt();
+				result.add(code);
+			}
+		}catch(EOFException e) {
+	        System.out.println(
+	          "End of stream encountered");
+	    }
 		return result;
 	}
 
