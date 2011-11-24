@@ -1,6 +1,5 @@
 package com.lzwcompressor;
 
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,7 +10,6 @@ import java.util.ArrayList;
 public class LZW {
 	private File file;
 	private FileInputStream file_input;
-	private DataInputStream data_input;
 	private Dictionary dicoCompression;
 	private Dictionary dicoDecompression;
 	private int numBits;
@@ -97,7 +95,6 @@ public class LZW {
 
 		file_input = new FileInputStream(file);
 
-		compressed = readCompressedFile(file_input);
 		code = compressed.get(index) >> (32 - ((8 + offset) * currentByte + startBit));
 		c = dicoDecompression.getValue(code);
 
@@ -150,10 +147,10 @@ public class LZW {
 
 			dicoDecompression.put(dicoDecompression.getIndex(),
 					w + entree.charAt(0));
-			System.out.println(" code =============== " + code);
-			System.out.println("dico " + dicoDecompression);
-			System.out.println("w '" + w + "'");
-			System.out.println("entree " + entree.charAt(0));
+			//System.out.println(" code =============== " + code);
+			//System.out.println("dico " + dicoDecompression);
+			//System.out.println("w '" + w + "'");
+			//System.out.println("entree " + entree.charAt(0));
 
 			w = entree;
 
@@ -164,13 +161,14 @@ public class LZW {
 	private int read_char(FileInputStream file) throws IOException {
 		int return_value;
 		int input_bit_count = 0;
-		long input_bit_buffer = 0;
+		int input_bit_buffer = 0;
 
 		while (input_bit_count <= 24) {
-			input_bit_buffer |= (long) file_input.read() << (24 - input_bit_count);
+			input_bit_buffer |= (int) file_input.read() << (24 - input_bit_count);
 			input_bit_count += 8;
 		}
-		return_value = (int) (input_bit_buffer >> (32 - numBits));
+		//return_value = (int) (input_bit_buffer >> (32 - numBits));
+		return_value = input_bit_buffer;
 		// input_bit_buffer <<= numBits;
 		input_bit_count -= numBits;
 
@@ -183,7 +181,6 @@ public class LZW {
 		int code = 0;
 		while (code != -1) {
 			code = read_char(file);
-			result.add(code);
 		}
 		return result;
 	}

@@ -13,8 +13,8 @@ public class LZWTest {
 		// String s =
 		// "Loremipsumdolorsitamet,consecteturadipiscingelit.Fuscenecturpisquisnequepdldgjskqdndsglqshdfdkfnqsifhdkflsdgiuqsjdkosidghjqspofhdfsoflqsjfiudsfhqsfghdsfiolulvinarporttitoracatodio.";
 		LZW lzw = new LZW(12);
-		lzw.compression(s);
-		//lzw.decompression("test.txt");
+		//lzw.compression(s);
+		lzw.decompression("test.txt");
 	}
 
 }
