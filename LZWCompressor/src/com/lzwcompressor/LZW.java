@@ -94,11 +94,13 @@ public class LZW {
 				
 				c = dicoDecompression.getValue(code);
 				
-				currentByte++;
+				
 				
 				if(32-((8+offset)* currentByte + startBit) == 0){
 					index++;
 					currentByte=1;
+				}else{
+					currentByte++;
 				}
 			}
 			else{
