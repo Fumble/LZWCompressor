@@ -89,6 +89,7 @@ public class LZW {
 		int startBit = 0;
 		int limit = 255;
 		int mask = 0x00ff;
+		Boolean test = false;
 
 		ArrayList<Integer> compressed = new ArrayList<Integer>();
 
@@ -116,8 +117,9 @@ public class LZW {
 				code = code & mask;
 
 				c = dicoDecompression.getValue(code);
-
-
+				
+				System.out.println("offset "+offset+" index "+index+" byte "+currentByte+" code "+code+" char "+c);	
+				
 				if (32 - ((8 + offset) * currentByte + startBit) == 0) {
 					index++;
 					currentByte = 1;
@@ -126,6 +128,10 @@ public class LZW {
 				}
 			} else {
 				startBit = Math.abs(32 - (8 + offset) * currentByte);
+				
+				System.out.println("offset "+offset+" index "+index+" byte "+currentByte+" code "+code+" char "+c);	
+				System.out.println("startBit "+startBit);
+				
 				code = compressed.get(index) >> (32 - ((8 + offset)
 						* currentByte - 2 * startBit));
 				code = code & startBit;
@@ -137,11 +143,17 @@ public class LZW {
 				c = dicoDecompression.getValue(code);
 			}
 
-			if (code == 0x0) {
+			if (code == 0x0 &&  !test) {
 				offset += 1;
 				mask += 0x0001;
-			} else if (code == (limit * (1 + offset) + 1)) {
+				limit = limit * 2 + 1;
+				test = true;
+				continue;
+			} else if (code == limit) {
 				offset += 1;
+				mask += 0x0001;
+			    limit = limit * 2 + 1;
+			    continue;
 			}
 
 			if (code > 255 && dicoDecompression.containsKey(code)) {
