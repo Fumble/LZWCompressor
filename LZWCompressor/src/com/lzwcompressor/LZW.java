@@ -98,7 +98,6 @@ public class LZW {
 					compressedList.add((int) w.charAt(0));
 				} else {
 					System.out.println(dicoCompression.getKey(w));
-					// System.out.println(w);
 					compressedList.add(dicoCompression.getKey(w));
 				}
 				w = String.valueOf(c);
@@ -268,16 +267,17 @@ public class LZW {
 				code = dsi.readInt();
 				result.add(code);
 			}
-			int off = 0;
-			code = 0x0;
-			while ((code != -1) && (off <= 16)) {
-				code |= (((int) dsi.readByte()) << (16 - off));
-				System.out.println(code);
-				dsi.readByte();
-				off += 8;
+			// Read the last 1 to 3 byte(s) of the file
+			if (dsi.available() > 0) {
+				int off = 0;
+				code = 0x0;
+				while ((code != -1) && (off <= 16)) {
+					code |= (((int) dsi.readByte()) << (16 - off));
+					System.out.println(code);
+					dsi.readByte();
+					off += 8;
+				}
 			}
-
-			System.out.println("hello");
 		} catch (EOFException e) {
 			result.add(code);
 			dsi.close();
