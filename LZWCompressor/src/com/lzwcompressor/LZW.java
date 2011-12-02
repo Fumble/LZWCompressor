@@ -1,5 +1,6 @@
 package com.lzwcompressor;
 
+import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
@@ -201,13 +202,29 @@ public class LZW {
 		ArrayList<Integer> result = new ArrayList<Integer>();
 		int code = 0;
 		try {
-			while (true) {
+			while (dsi.available() >= 4) {
 				code = dsi.readInt();
 				result.add(code);
 			}
+			int off= 0;
+			code = 0x0;
+			while((code != -1) && (off <= 16)){
+				System.out.println("coucou");
+				code |= (((int)dsi.readByte()) << (16 - off));
+				System.out.println(code);
+				dsi.readByte();
+				off += 8;
+			}
+			
+			System.out.println("hello");
 		} catch (EOFException e) {
+			result.add(code);
+			dsi.close();
 			System.out.println("End of stream encountered");
 		}
+//		for(int i = 0; i< result.size(); i++){
+//			System.out.print(result.get(i)+ " ");
+//		}
 		return result;
 	}
 
