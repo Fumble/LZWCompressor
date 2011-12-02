@@ -14,7 +14,9 @@ public class LZWTest {
 		// "Loremipsumdolorsitamet,consecteturadipiscingelit.Fuscenecturpisquisnequepdldgjskqdndsglqshdfdkfnqsifhdkflsdgiuqsjdkosidghjqspofhdfsoflqsjfiudsfhqsfghdsfiolulvinarporttitoracatodio.";
 		LZW lzw = new LZW(12);
 		//lzw.compression(s);
-		lzw.decompression("test.txt");
+		lzw.compressNoFile(s);
+		lzw.decompressNoFile();
+		//lzw.decompression("test.txt");
 	}
 
 }

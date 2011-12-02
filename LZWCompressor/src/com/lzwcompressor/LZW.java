@@ -17,6 +17,7 @@ public class LZW {
 	private int numBits;
 	private int output_bit_buffer = 0;
 	private int output_bit_count = 0;
+	private ArrayList<Integer> compressedList;
 
 	public LZW() {
 		numBits = 12;
@@ -79,6 +80,66 @@ public class LZW {
 		os.close();
 	}
 
+	public void compressNoFile(String s) {
+		dicoCompression = new Dictionary(1 << numBits);
+		dicoCompression.init();
+		String w = "";
+		char c;
+		int i = 0;
+		compressedList = new ArrayList<Integer>();
+		while (i < s.length()) {
+			c = s.charAt(i);
+			if (dicoCompression.containsValue(w + c)) {
+				w = w + c;
+			} else {
+				dicoCompression.put(dicoCompression.getIndex(), w + c);
+				if (dicoCompression.getKey(w) <= 255) {
+					System.out.println(w);
+					compressedList.add((int) w.charAt(0));
+				} else {
+					System.out.println(dicoCompression.getKey(w));
+					// System.out.println(w);
+					compressedList.add(dicoCompression.getKey(w));
+				}
+				w = String.valueOf(c);
+			}
+			i++;
+		}
+		System.out.println(dicoCompression.getKey(w));
+		compressedList.add(dicoCompression.getKey(w));
+	}
+
+	public void decompressNoFile() {
+		String w = "";
+		String res;
+		int index = 0;
+		int code;
+		String entree;
+		dicoDecompression = new Dictionary();
+		dicoDecompression.init();
+
+		code = compressedList.get(index);
+		res = "" + (char) code;
+		w = "" + (char) code;
+		System.out.print("Decompressed string: " + res);
+		while (index < compressedList.size() - 1) {
+			code = compressedList.get(++index);
+			if (code > 255 && dicoDecompression.containsKey(code)) {
+				entree = dicoDecompression.getValue(code);
+				System.out.print(entree);
+			} else if (code > 255 && !dicoDecompression.containsKey(code)) {
+				entree = w + w.charAt(0);
+				System.out.print(entree);
+			} else {
+				entree = "" + (char) code;
+				System.out.print(entree);
+			}
+			dicoDecompression.put(dicoDecompression.getIndex(),
+					w + entree.charAt(0));
+			w = entree;
+		}
+	}
+
 	public void decompression(String filename) throws IOException {
 		int code;
 		String c = null, w = null, entree = null;
@@ -114,11 +175,12 @@ public class LZW {
 			if ((32 - ((8 + offset) + startBit)) >= 0) {
 				code = compressed.get(index) >> (32 - ((8 + offset) + startBit));
 				code = code & mask;
-				
+
 				c = dicoDecompression.getValue(code);
-				
-				System.out.println("offset "+offset+" index "+index+" byte "+" code "+code+" char "+c);	
-				
+
+				System.out.println("offset " + offset + " index " + index
+						+ " byte " + " code " + code + " char " + c);
+
 				if (32 - ((8 + offset) + startBit) == 0) {
 					index++;
 					startBit += 8 + offset;
@@ -129,17 +191,18 @@ public class LZW {
 				}
 			} else {
 				startBit = Math.abs(32 - (8 + offset) + startBit);
-				
-				System.out.println("offset "+offset+" index "+index+" code "+code+" char "+c);	
-				System.out.println("startBit "+startBit);
-				
+
+				System.out.println("offset " + offset + " index " + index
+						+ " code " + code + " char " + c);
+				System.out.println("startBit " + startBit);
+
 				code = compressed.get(index) >> (32 - ((32 - 8 + offset - startBit)));
 				code = code & startBit;
 				index++;
 				code |= compressed.get(index) >> (32 - startBit);
 
 				c = dicoDecompression.getValue(code);
-				
+
 				startBit += 8 + offset;
 				startBit %= 32;
 			}
@@ -205,25 +268,24 @@ public class LZW {
 				code = dsi.readInt();
 				result.add(code);
 			}
-			int off= 0;
+			int off = 0;
 			code = 0x0;
-			while((code != -1) && (off <= 16)){
-				System.out.println("coucou");
-				code |= (((int)dsi.readByte()) << (16 - off));
+			while ((code != -1) && (off <= 16)) {
+				code |= (((int) dsi.readByte()) << (16 - off));
 				System.out.println(code);
 				dsi.readByte();
 				off += 8;
 			}
-			
+
 			System.out.println("hello");
 		} catch (EOFException e) {
 			result.add(code);
 			dsi.close();
 			System.out.println("End of stream encountered");
 		}
-//		for(int i = 0; i< result.size(); i++){
-//			System.out.print(result.get(i)+ " ");
-//		}
+		// for(int i = 0; i< result.size(); i++){
+		// System.out.print(result.get(i)+ " ");
+		// }
 		return result;
 	}
 
