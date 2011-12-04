@@ -2,6 +2,8 @@ package com.lzwcompressor;
 
 import java.io.IOException;
 
+import com.lzwcompressor.huffman.Huffman;
+
 public class LZWTest {
 
 	/**
@@ -9,17 +11,19 @@ public class LZWTest {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		String s = "tobeornottobeortobeornot";
-		// String s =
-		// "Loremipsumdolorsitamet,consecteturadipiscingelit.Fuscenecturpisquisnequepdldgjskqdndsglqshdfdkfnqsifhdkflsdgiuqsjdkosidghjqspofhdfsoflqsjfiudsfhqsfghdsfiolulvinarporttitoracatodio.";
+		// String s = "tobeornottobeortobeornot";
+		String s = "Loremipsumdolorsitamet,consecteturadipiscingelit.Fuscenecturpisquisnequepdldgjskqdndsglqshdfdkfnqsifhdkflsdgiuqsjdkosidghjqspofhdfsoflqsjfiudsfhqsfghdsfiolulvinarporttitoracatodio.";
+
 		LZW lzw = new LZW(12);
-		//lzw.compression(s);
+		lzw.compression(s);
+		// lzw.decompression("test.txt");
+		// lzw.compressNoFile(s);
+		// lzw.decompressNoFile();
 
-		lzw.decompression("test.txt");
+		// Huffman encoding
+		 Huffman huff;
+		 huff = new Huffman("test.txt");
 
-		lzw.compressNoFile(s);
-		lzw.decompressNoFile();
-		//lzw.decompression("test.txt");
 	}
 
 }

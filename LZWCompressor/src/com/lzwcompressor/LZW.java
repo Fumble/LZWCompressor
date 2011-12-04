@@ -28,6 +28,7 @@ public class LZW {
 	}
 
 	public void compression(String s) throws IOException {
+		System.out.println("***** LZW compression *****");
 		dicoCompression = new Dictionary(1 << numBits);
 		dicoCompression.init();
 		String w = "";
@@ -41,6 +42,7 @@ public class LZW {
 		char symbol8 = 0x0;
 		int symbol = 0xFFFF;
 		int offset = 8;
+		System.out.print("Encoded string: ");
 
 		while (i < s.length()) {
 			c = s.charAt(i);
@@ -49,7 +51,7 @@ public class LZW {
 			} else {
 				dicoCompression.put(dicoCompression.getIndex(), w + c);
 				if (dicoCompression.getKey(w) <= 255) {
-					System.out.println(w);
+					System.out.print(w);
 					os.write(w.charAt(0));
 				} else {
 					if (((dicoCompression.getIndex() - 1) > limit)
@@ -64,8 +66,7 @@ public class LZW {
 						limit = limit * 2 + 1;
 						offset++;
 					}
-					System.out.println(dicoCompression.getKey(w));
-					// System.out.println(w);
+					System.out.print("<" + dicoCompression.getKey(w) + ">");
 					writeCode(os, dicoCompression.getKey(w));
 
 				}
@@ -73,14 +74,19 @@ public class LZW {
 			}
 			i++;
 		}
-		System.out.println(dicoCompression.getKey(w));
+		System.out.println("<" + dicoCompression.getKey(w) + ">");
 		// System.out.println(w);
 		writeCode(os, dicoCompression.getKey(w));
 		os.flush();
 		os.close();
+		File f = new File(filename);
+		System.out.println("Decompressed file size: " + s.length());
+		System.out.println("Compressed file size: " + f.length());
 	}
 
 	public void compressNoFile(String s) {
+		System.out.println("***** LZW compression *****");
+		System.out.print("Encoded string: ");
 		dicoCompression = new Dictionary(1 << numBits);
 		dicoCompression.init();
 		String w = "";
@@ -94,17 +100,17 @@ public class LZW {
 			} else {
 				dicoCompression.put(dicoCompression.getIndex(), w + c);
 				if (dicoCompression.getKey(w) <= 255) {
-					System.out.println(w);
+					System.out.print(w);
 					compressedList.add((int) w.charAt(0));
 				} else {
-					System.out.println(dicoCompression.getKey(w));
+					System.out.print("<" + dicoCompression.getKey(w) + ">");
 					compressedList.add(dicoCompression.getKey(w));
 				}
 				w = String.valueOf(c);
 			}
 			i++;
 		}
-		System.out.println(dicoCompression.getKey(w));
+		System.out.println("<" + dicoCompression.getKey(w) + ">");
 		compressedList.add(dicoCompression.getKey(w));
 	}
 
@@ -116,6 +122,7 @@ public class LZW {
 		String entree;
 		dicoDecompression = new Dictionary();
 		dicoDecompression.init();
+		System.out.print("Decoded string: ");
 
 		code = compressedList.get(index);
 		res = "" + (char) code;
@@ -144,7 +151,6 @@ public class LZW {
 		String c = null, w = null, entree = null;
 		int index = 0;
 		int offset = 0;
-		int currentByte = 1;
 		int startBit = 0;
 		int limit = 255;
 		int mask = 0x00ff;
@@ -166,8 +172,6 @@ public class LZW {
 		System.out.println(c);
 
 		w = c;
-
-		currentByte++;
 
 		while (code != -1) {
 
@@ -195,6 +199,7 @@ public class LZW {
 						+ " code " + code + " char " + c);
 				System.out.println("startBit " + startBit);
 
+				// TODO check the mask
 				code = compressed.get(index) >> (32 - ((32 - 8 + offset - startBit)));
 				code = code & startBit;
 				index++;
@@ -233,29 +238,11 @@ public class LZW {
 					w + entree.charAt(0));
 
 			// System.out.println(code);
-
 			w = entree;
-
 			// System.out.println(c);
 		}
 	}
 
-	private int read_char(FileInputStream file) throws IOException {
-		int return_value;
-		int input_bit_count = 0;
-		int input_bit_buffer = 0;
-
-		while (input_bit_count <= 24) {
-			input_bit_buffer |= (int) file_input.read() << (24 - input_bit_count);
-			input_bit_count += 8;
-		}
-		// return_value = (int) (input_bit_buffer >> (32 - numBits));
-		return_value = input_bit_buffer;
-		// input_bit_buffer <<= numBits;
-		input_bit_count -= numBits;
-
-		return (return_value);
-	}
 
 	private ArrayList<Integer> readCompressedFile(FileInputStream file)
 			throws IOException {
